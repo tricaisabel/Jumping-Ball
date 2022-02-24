@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Moving Ball</title>
+        
+        <style>
+            * { 
+                padding: 5px; 
+                margin: 15px;
+                font-family:'Trebuchet MS';
+            }
+            canvas { background: #eee;}
+            #buttons{display:block;}
+            h1{color:#0095DD;}
+        </style>
+    </head>
+    <body>
+        <h1>Bouncing Ball</h1>
+        <p>Move the paddle using the left and right arrows so the ball bounces back</p>
+        <div id="buttons">
+            <button onclick="startGame1()">Easy Game</button>
+            <button onclick="startGame2()">Medium Game</button>
+            <button onclick="startGame3()">Hard Game</button>
+        </div>
+        
+        <canvas id="myCanvas" width="480" height="320"></canvas>
+        <script>
+            var canvas = document.getElementById("myCanvas");
+                var ctx = canvas.getContext("2d");
+
+                var ballRadius = 10;
+                var x = canvas.width / 2;
+                var y = canvas.height - 30;
+                var dx = -2;
+                var dy = -2;
+
+                var paddleHeight = 10;
+                var paddleWidth = 75;
+                var paddleX = (canvas.width - paddleWidth) / 2;
+                var rightPressed = false;
+                var leftPressed = false;
+
+                document.addEventListener("keydown", keyDownHandler, false);
+                document.addEventListener("keyup", keyUpHandler, false);
+
+                function keyDownHandler(e) {
+                    if (e.key == "ArrowRight") {
+                        rightPressed = true;
+                    }
+                    else if (e.key == "ArrowLeft") {
+                        leftPressed = true;
+                    }
+                }
+
+                function keyUpHandler(e) {
+                    if (e.key == "ArrowRight") {
+                        rightPressed = false;
+                    }
+                    else if (e.key == "ArrowLeft") {
+                        leftPressed = false;
+                    }
+                }
+
+                function drawBall() {
+                    ctx.beginPath();
+                    ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+                    let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+                    ctx.fillStyle = `#${randomColor}`;
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                function drawPaddle() {
+                    ctx.beginPath();
+                    ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+                    ctx.fillStyle = "#0095DD";
+                    ctx.fill();
+                    ctx.closePath();
+                }
+
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    drawBall();
+                    drawPaddle();
+                    //bounce stanga-dreapta
+                    if (x + dx + ballRadius > canvas.width || x + dx - ballRadius < 0) {
+                        dx = -dx;
+                    }
+                    //bounce sus
+                    if (y + dy - ballRadius < 0) {
+                        dy = -dy;
+                    }
+                    //bounce jos
+                    else if (y + dy + ballRadius > canvas.height) {
+                        //bounce with paddle
+                        if (paddleX < x && x < paddleX + paddleWidth) {
+                            dy = -dy;
+                        }
+                        //bounce without paddle-game over
+                        else {
+                            document.location.reload();
+                            alert("GAME OVER");
+                            clearInterval(interval);
+                        }
+                    }
+
+                    if (rightPressed && paddleX + paddleWidth < canvas.width) {
+                        paddleX += 4;
+                    }
+                    else if (leftPressed && paddleX > 0) {
+                        paddleX -= 4;
+                    }
+
+                    x += dx;
+                    y += dy;
+                }
+
+                function startGame1() {
+                    var interval = setInterval(draw, 15);
+                }
+
+                function startGame2() {
+                    var interval = setInterval(draw, 10);
+                }
+
+                function startGame3() {
+                    var interval = setInterval(draw, 6);
+                }
+        </script>
+    </body>
+</html>
